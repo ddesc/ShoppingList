@@ -23,5 +23,5 @@ WORKDIR /app
 COPY . .
 
 # Your install/run commands go here, e.g.:
-# RUN pip install -r requirements.txt
-# CMD ["python", "app.py"]
+RUN pip install -r requirements.txt
+CMD ["python", "app.py"]
