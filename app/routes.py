@@ -22,12 +22,17 @@ def execute_query(query, params=()):
 
 @bp.route('/list', methods=['GET'])
 def get_list():
-    sql = 'SELECT list_guid, text FROM ToDoList'
+    sql = """
+        SELECT list_guid, text, completed
+        FROM ToDoList
+        ORDER BY list_id
+    """
     result = execute_query(sql)
 
     jsonList = [{
         "id": row[0],
-        "text": row[1]
+        "text": row[1],
+        "completed": row[2]
     } for row in result[1]]
     
     return jsonify(jsonList)
@@ -61,3 +66,27 @@ def delete_item(list_guid):
         return jsonify({"error": "Item not found."}), 404
 
     return jsonify({"message": "Item deleted."}), 200
+
+
+@bp.route('/item/<string:list_guid>', methods=['PUT'])
+def update_item(list_guid):
+    data = request.get_json()
+    text = data.get('text', '')
+    completedFlag = data.get('completed', '')
+    current_date = datetime.now()
+
+    sql = """
+        UPDATE ToDoList
+        SET text = ?
+        ,   completed = ?
+        ,   updated_at = ?
+        WHERE list_guid = ?
+    """
+    sqlParams = (text, completedFlag, current_date, list_guid)
+
+    result = execute_query(sql, sqlParams)
+
+    if result[0] > 0:
+        return jsonify({"message": "Item updated.", "id": list_guid}), 201
+    else:
+        return jsonify({"message": "Item failed to update."}), 400
