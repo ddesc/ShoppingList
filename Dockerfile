@@ -47,6 +47,7 @@ COPY . .
 
 # Install Python dependencies
 RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install flask-cors
 
 # Start the app (update this to match your entry point)
 CMD ["python", "main.py"]
